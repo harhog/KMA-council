@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+# Notion working files (local only)
+.page*.json
+.page*.txt
+.notion*.html
+.notion-api.ts
+.contentPreview.js
+.extract07.py
+.list_pages.py
+# Env / secrets
+.env
+# OS
+.DS_Store
+Thumbs.db
