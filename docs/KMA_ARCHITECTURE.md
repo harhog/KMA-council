@@ -355,12 +355,19 @@ parser failure, corrupted/duplicate document, atomic rollback,
 stale snapshot, hash mismatch.
 ## 11. Implementation sequence (sida 06, 08, 11)
 
-STATUS (sida 11): KMA-001..KMA-003 klara -> nasta task KMA-004 (Agent Contracts).
+STATUS (sida 11): KMA-001..KMA-004 klara -> nasta task KMA-005 (Council Orchestration).
+
+Fas-1-gate (§11 och §14), dokumenterad 2026-10-09 i samband med KMA-004 - inget tidigare formellt beslut pastas. Resultat baserat pa befintliga implementationer och körda tester i detta repo:
+(1) registrerbar officiell kalla = kma/sources + tests/test_registry.py;
+(2) avgorbar version/currentness = SourceVersion + Currentness + tests/test_validation.py;
+(3) lankbar evidence = Evidence + EvidenceEngine.trace + tests/test_evidence.py (test_traceability_to_exact_version);
+(4) stoppade unsupported claims = EvidenceEngine-gaten + tests/test_evidence.py (test_unknown_source, test_unknown_source_version, test_verified_requires_all_requirements, test_claim_gate).
+Fas-1-gate: uppfylld enligt s11. Hela regressionssviten godkand vid dokumentationstillfallet: python -m unittest discover -s tests - 118 tester OK.
 
 1. KMA-001 Arkitektur (denna task — endast detta dokument)
 2. KMA-002 Source Registry (klar)
 3. KMA-003 Evidence Engine (klar)
-4. KMA-004 Agent Contracts
+4. KMA-004 Agent Contracts (klar)
 5. KMA-005 Council Orchestration
 6. KMA-006 Workflows
 7. KMA-007 Memory/Audit
