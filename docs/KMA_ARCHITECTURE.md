@@ -355,11 +355,11 @@ parser failure, corrupted/duplicate document, atomic rollback,
 stale snapshot, hash mismatch.
 ## 11. Implementation sequence (sida 06, 08, 11)
 
-STATUS (sida 11): PHASE_0_RECON -> nasta task KMA-001 (denna task).
+STATUS (sida 11): KMA-001..KMA-003 klara -> nasta task KMA-004 (Agent Contracts).
 
 1. KMA-001 Arkitektur (denna task — endast detta dokument)
-2. KMA-002 Source Registry
-3. KMA-003 Evidence Engine
+2. KMA-002 Source Registry (klar)
+3. KMA-003 Evidence Engine (klar)
 4. KMA-004 Agent Contracts
 5. KMA-005 Council Orchestration
 6. KMA-006 Workflows
