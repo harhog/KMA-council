@@ -355,7 +355,7 @@ parser failure, corrupted/duplicate document, atomic rollback,
 stale snapshot, hash mismatch.
 ## 11. Implementation sequence (sida 06, 08, 11)
 
-STATUS (sida 11): KMA-001..KMA-004 klara -> nasta task KMA-005 (Council Orchestration).
+STATUS (sida 11): KMA-001..KMA-005 klara -> nasta task KMA-006 (Workflows).
 
 Fas-1-gate (§11 och §14), dokumenterad 2026-10-09 i samband med KMA-004 - inget tidigare formellt beslut pastas. Resultat baserat pa befintliga implementationer och körda tester i detta repo:
 (1) registrerbar officiell kalla = kma/sources + tests/test_registry.py;
@@ -368,7 +368,7 @@ Fas-1-gate: uppfylld enligt s11. Hela regressionssviten godkand vid dokumentatio
 2. KMA-002 Source Registry (klar)
 3. KMA-003 Evidence Engine (klar)
 4. KMA-004 Agent Contracts (klar)
-5. KMA-005 Council Orchestration
+5. KMA-005 Council Orchestration (klar)
 6. KMA-006 Workflows
 7. KMA-007 Memory/Audit
 8. KMA-008 Research
