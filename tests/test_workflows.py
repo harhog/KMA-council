@@ -139,6 +139,64 @@ class TestValidateRoute(unittest.TestCase):
             validate_route("A", ["NOBODY"])
 
 
+class TestRouteHintReviewGuard(unittest.TestCase):
+    """En route-hint får förfina men aldrig stryka obligatoriska granskningsagenter.
+
+    REVISION/REDTEAM som ingår i en workflows agent_route skyddas (§7: REDTEAM +
+    REVISION körs före syntes; i smala routes minst RESEARCH-verifiering).
+    Testar faktiskt beteende genom befintlig pipeline, inte bara hjälpfunktionen.
+    """
+
+    def test_hint_dropping_revision_rejected(self):
+        # D/E/F har REVISION i agent_route; en hint som utelämnar den avvisas.
+        for wid in ("D", "E", "F"):
+            allowed = tuple(WORKFLOWS[wid]["agent_route"])
+            self.assertIn("REVISION", allowed)
+            hint = [a for a in allowed if a != "REVISION"]
+            with self.subTest(workflow=wid):
+                with self.assertRaises(WorkflowRouteError):
+                    validate_route(wid, hint)
+
+    def test_revision_explicit_drop_example_rejected(self):
+        # Exemplet ur granskningsfyndet: E med [AFS, RESEARCH] stryker REVISION.
+        with self.assertRaises(WorkflowRouteError):
+            validate_route("E", ["AFS", "RESEARCH"])
+
+    def test_valid_complete_standard_route_accepted(self):
+        for wid in ALL_IDS:
+            allowed = tuple(WORKFLOWS[wid]["agent_route"])
+            self.assertEqual(validate_route(wid, list(allowed)), allowed)
+
+    def test_valid_subset_without_review_agent_accepted(self):
+        # A har ingen granskningsagent; förfining till [RESEARCH] är tillåten.
+        self.assertEqual(validate_route("A", ["RESEARCH"]), ("RESEARCH",))
+
+    def test_unknown_agent_still_rejected(self):
+        with self.assertRaises(WorkflowRouteError):
+            validate_route("E", ["REVISION", "AFS", "NOBODY"])
+
+    def test_unknown_workflow_id_still_rejected(self):
+        with self.assertRaises(UnknownWorkflowError):
+            validate_route("Z", ["AFS"])
+
+    def test_run_workflow_cannot_bypass_review_via_route_hint(self):
+        # Manipulerad hint som stryker REVISION stoppas som valideringsfel
+        # innan pipelinen körs — granskningsgrinden kan inte kringgås via hint.
+        with self.assertRaises(WorkflowRouteError):
+            run_workflow("E", REQUIRED_INTAKE["E"],
+                         contributions=full_contributions(("AFS", "RESEARCH")),
+                         route_hint=["AFS", "RESEARCH"])
+
+    def test_missing_review_agent_not_hidden_by_fewer_contributions(self):
+        # Full standardroute kräver alla agenter; utelämnar anroparen REVISION
+        # fångar pipelinens egen grind det (PipelineError, ej en tyst förfining).
+        from kma.council.errors import PipelineError
+
+        with self.assertRaises(PipelineError):
+            run_workflow("E", REQUIRED_INTAKE["E"],
+                         contributions=full_contributions(("AFS", "PRAKTIK", "RESEARCH")))
+
+
 class TestValidateIntake(unittest.TestCase):
     def test_valid_required_intake_accepted(self):
         for wid in ALL_IDS:
