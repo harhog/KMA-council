@@ -138,6 +138,11 @@ class TestValidateRoute(unittest.TestCase):
         with self.assertRaises(WorkflowRouteError):
             validate_route("A", ["NOBODY"])
 
+    def test_duplicate_agents_deduplicated(self):
+        # Determinism: duplicerade hint-agenter travanas bort, ordning bevaras.
+        self.assertEqual(validate_route("A", ["AFS", "AFS", "RESEARCH"]), ("AFS", "RESEARCH"))
+        self.assertEqual(validate_route("A", ["RESEARCH", "RESEARCH"]), ("RESEARCH",))
+
 
 class TestValidateIntake(unittest.TestCase):
     def test_valid_required_intake_accepted(self):
@@ -169,6 +174,13 @@ class TestValidateIntake(unittest.TestCase):
         intake["utrustning"] = "selar"
         validated = validate_intake("A", intake)
         self.assertEqual(validated["utrustning"], "selar")
+
+    def test_non_mapping_intake_rejected_as_workflow_error(self):
+        # Icke-Mapping-intake far inte lacka ut som rå TypeError.
+        for bad in (None, ["situation"], "situation", 42):
+            with self.subTest(bad=type(bad).__name__):
+                with self.assertRaises(WorkflowIntakeError):
+                    validate_intake("A", bad)
 
 
 
@@ -206,6 +218,11 @@ class TestRunWorkflowPositive(unittest.TestCase):
         # Saknad obligatorisk intake far aldrig gissas: valideringsfel, inte beslut.
         with self.assertRaises(WorkflowIntakeError):
             run_workflow("A", {"situation": "x"})
+
+    def test_non_mapping_intake_raises_workflow_error_not_type_error(self):
+        # run_workflow propagerar valideringsfelet; rå TypeError läcker inte ut.
+        with self.assertRaises(WorkflowIntakeError):
+            run_workflow("A", None)
 
 
 class TestEvidenceGatePreserved(unittest.TestCase):

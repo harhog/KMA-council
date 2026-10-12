@@ -1,0 +1,23 @@
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        # Enda beroendet ar pydantic (v2-API anvands i modeller/evidens).
+        run: python -m pip install --upgrade pip "pydantic>=2"
+      - name: Run test suite
+        # Samma kommando som projektet kor lokalt; cwd (repo-root) ligger pa
+        # sys.path via -m sa ar kma importerbar utan paket-init i tests/.
+        run: python -m unittest discover -s tests
