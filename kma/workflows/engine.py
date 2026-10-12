@@ -148,6 +148,11 @@ def validate_intake(
 
 # ---------------------------------------------------------------- route --
 
+# Granskningsagenter som aldrig får strykas av en route-hint när de ingår i
+# workflowets agent_route (arkitektur §7: REVISION/REDTEAM före syntes). En
+# hint får förfina routen men aldrig ta bort en obligatorisk granskningsagent.
+REVIEW_AGENTS: tuple[str, ...] = ("REVISION", "REDTEAM")
+
 
 def validate_route(
     workflow_id: str, route_hint: Sequence[str] | None
@@ -172,6 +177,15 @@ def validate_route(
         raise WorkflowRouteError(
             f"agent {invalid!r} kan inte läggas till workflow {workflow_id!r} "
             f"(giltiga: {sorted(allowed)})"
+        )
+    # En hint får förfina routen men inte ta bort obligatoriska granskningsagenter.
+    protected = [a for a in REVIEW_AGENTS if a in allowed]
+    dropped = [a for a in protected if a not in hint]
+    if dropped:
+        raise WorkflowRouteError(
+            f"route-hint får inte ta bort obligatoriska granskningsagenter "
+            f"{dropped!r} från workflow {workflow_id!r} "
+            f"(skyddade: {sorted(protected)})"
         )
     return tuple(dict.fromkeys(hint))
 
