@@ -10,6 +10,7 @@ inklusive snapshot_ref.
 """
 from __future__ import annotations
 
+from collections.abc import Mapping as _MappingABC
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -113,6 +114,10 @@ def validate_intake(
     avvisas (ingen gissning, ingen fyllning). Returnerar rensat dict.
     """
     spec = select_workflow(workflow_id)
+    if not isinstance(intake, _MappingABC):
+        raise WorkflowIntakeError(
+            f"intake måste vara en mappning (Mapping), fick {type(intake).__name__}"
+        )
     required = set(spec["required_intake"])
     optional = set(spec["optional_intake"])
     errors: list[str] = []
@@ -182,7 +187,7 @@ def validate_route(
             f"{dropped!r} från workflow {workflow_id!r} "
             f"(skyddade: {sorted(protected)})"
         )
-    return tuple(hint)
+    return tuple(dict.fromkeys(hint))
 
 
 # ----------------------------------------------------------------- question --
